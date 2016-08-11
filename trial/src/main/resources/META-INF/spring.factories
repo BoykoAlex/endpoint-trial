@@ -1,0 +1,5 @@
+org.springframework.boot.actuate.autoconfigure.EndpointWebMvcConfiguration=\
+com.trial.HelloEndpoint
+
+org.springframework.boot.actuate.autoconfigure.ManagementContextConfiguration=\
+com.trial.EndpointWebMvcManagementContextConfiguration
