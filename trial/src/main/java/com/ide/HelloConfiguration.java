@@ -1,4 +1,4 @@
-package com.trial;
+package com.ide;
 
 import org.springframework.context.annotation.Bean;
 

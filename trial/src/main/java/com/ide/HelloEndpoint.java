@@ -1,4 +1,4 @@
-package com.trial;
+package com.ide;
 
 import org.springframework.boot.actuate.endpoint.Endpoint;
 import org.springframework.stereotype.Component;

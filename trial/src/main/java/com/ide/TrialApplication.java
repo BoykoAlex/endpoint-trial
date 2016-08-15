@@ -1,4 +1,4 @@
-package com.trial;
+package com.ide;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
