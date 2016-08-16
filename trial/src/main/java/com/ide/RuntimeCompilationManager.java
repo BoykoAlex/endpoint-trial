@@ -12,8 +12,12 @@ public class RuntimeCompilationManager {
 		if (path == null || path.length() == 0) {
 			path = ".";
 		}
+		String classespath = System.getProperty("classespath");
 		System.out.println("Watch root: " + path);
 		sourceWatcher = new SourceWatcher(path);
+		if (classespath!=null && classespath.length()!=0) {
+			sourceWatcher.setClassesPath(classespath);
+		}
 		sourceWatcher.start();
 	}
 
