@@ -35,8 +35,6 @@ public class RuntimeJavaCompiler {
 	
 	private JavaCompiler compiler =  ToolProvider.getSystemJavaCompiler();
 	
-//	private static Logger logger = LoggerFactory.getLogger(RuntimeJavaCompiler.class);
-	
 	/**
 	 * Compile the named class consisting of the supplied source code. If successful load the class
 	 * and return it. Multiple classes may get loaded if the source code included anonymous/inner/local

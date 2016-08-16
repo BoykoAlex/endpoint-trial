@@ -27,8 +27,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.StandardLocation;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * A file manager that serves source code from in memory and ensures output results are kept in memory
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MemoryBasedJavaFileManager implements JavaFileManager {
 
-	private static Logger logger = LoggerFactory.getLogger(MemoryBasedJavaFileManager.class);
+//	private static Logger logger = LoggerFactory.getLogger(MemoryBasedJavaFileManager.class);
 	
 	private CompilationOutputCollector outputCollector;
 
@@ -51,7 +51,7 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 
 	@Override
 	public int isSupportedOption(String option) {
-		logger.debug("isSupportedOption({})",option);
+		//logger.debug("isSupportedOption({})",option);
 		return -1; // Not yet supporting options
 	}
 
@@ -59,23 +59,23 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 	public ClassLoader getClassLoader(Location location) {
 		// Do not simply return the context classloader as it may get closed and then
 		// be unusable for loading any further classes
-		logger.debug("getClassLoader({})",location);
+		//logger.debug("getClassLoader({})",location);
 		return null; // Do not currently need to load plugins
 	}
 
 	@Override
 	public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse)
 			throws IOException {
-		logger.debug("list({},{},{},{})",location,packageName,kinds,recurse);
+		//logger.debug("list({},{},{},{})",location,packageName,kinds,recurse);
 		CloseableFilterableJavaFileObjectIterable resultIterable = null;
 		if (location == StandardLocation.PLATFORM_CLASS_PATH && (kinds==null || kinds.contains(Kind.CLASS))) {
 			String sunBootClassPath = System.getProperty("sun.boot.class.path");
-			logger.debug("Creating iterable for boot class path: {}",sunBootClassPath);
+			//logger.debug("Creating iterable for boot class path: {}",sunBootClassPath);
 			resultIterable = new IterableClasspath(sunBootClassPath, packageName, recurse);
 			toClose.add(resultIterable);
 		} else if (location == StandardLocation.CLASS_PATH && (kinds==null || kinds.contains(Kind.CLASS))) {
 			String javaClassPath = System.getProperty("java.class.path");
-			logger.debug("Creating iterable for class path: {}",javaClassPath);
+			//logger.debug("Creating iterable for class path: {}",javaClassPath);
 			resultIterable = new IterableClasspath(javaClassPath, packageName, recurse);
 			toClose.add(resultIterable);
 		} else if (location == StandardLocation.SOURCE_PATH) {
@@ -90,7 +90,7 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 
 	@Override
 	public boolean hasLocation(Location location) {
-		logger.debug("hasLocation({})",location);
+		//logger.debug("hasLocation({})",location);
 		return (location == StandardLocation.SOURCE_PATH ||
 				location == StandardLocation.CLASS_PATH ||
 				location == StandardLocation.PLATFORM_CLASS_PATH);
@@ -109,41 +109,41 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 
 	@Override
 	public boolean isSameFile(FileObject a, FileObject b) {
-		logger.debug("isSameFile({},{})",a,b);
+		//logger.debug("isSameFile({},{})",a,b);
 		return a.equals(b);
 	}
 
 	@Override
 	public boolean handleOption(String current, Iterator<String> remaining) {
-		logger.debug("handleOption({},{})",current,remaining);
+		//logger.debug("handleOption({},{})",current,remaining);
 		return false; // This file manager does not manage any options
 	}
 
 
 	@Override
 	public JavaFileObject getJavaFileForInput(Location location, String className, Kind kind) throws IOException {
-		logger.debug("getJavaFileForInput({},{},{})",location,className,kind);
+		//logger.debug("getJavaFileForInput({},{},{})",location,className,kind);
 		throw new IllegalStateException("Not expected to be used in this context");
 	}
 
 	@Override
 	public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind, FileObject sibling)
 			throws IOException {
-		logger.debug("getJavaFileForOutput({},{},{},{})",location,className,kind,sibling);
+		//logger.debug("getJavaFileForOutput({},{},{},{})",location,className,kind,sibling);
 		// Example parameters: CLASS_OUTPUT, Foo, CLASS, StringBasedJavaSourceFileObject[string:///a/b/c/Foo.java]
 		return outputCollector.getJavaFileForOutput(location, className, kind, sibling);
 	}
 
 	@Override
 	public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
-		logger.debug("getFileForInput({},{},{})",location,packageName,relativeName);
+		//logger.debug("getFileForInput({},{},{})",location,packageName,relativeName);
 		throw new IllegalStateException("Not expected to be used in this context");
 	}
 
 	@Override
 	public FileObject getFileForOutput(Location location, String packageName, String relativeName, FileObject sibling)
 			throws IOException {
-		logger.debug("getFileForOutput({},{},{},{})",location,packageName,relativeName,sibling);
+		//logger.debug("getFileForOutput({},{},{},{})",location,packageName,relativeName,sibling);
 		// This can be called when the annotation config processor runs
 		// Example parameters: CLASS_OUTPUT, , META-INF/spring-configuration-metadata.json, null
 		return outputCollector.getFileForOutput(location, packageName, relativeName, sibling);

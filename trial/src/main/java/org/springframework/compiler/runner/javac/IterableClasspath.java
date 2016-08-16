@@ -30,8 +30,8 @@ import java.util.zip.ZipInputStream;
 
 import javax.tools.JavaFileObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * Iterable that will produce an iterator that returns classes found
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IterableClasspath extends CloseableFilterableJavaFileObjectIterable {
 
-	private static Logger logger = LoggerFactory.getLogger(IterableClasspath.class);
+//	private static Logger logger = LoggerFactory.getLogger(IterableClasspath.class);
 	
 	private List<File> classpathEntries = new ArrayList<>();
 	
@@ -63,7 +63,7 @@ public class IterableClasspath extends CloseableFilterableJavaFileObjectIterable
 			if (f.exists()) {
 				classpathEntries.add(f);
 			} else {
-				logger.debug("path element does not exist {}",f);
+//				logger.debug("path element does not exist {}",f);
 			}
 		}
 	}
@@ -73,7 +73,7 @@ public class IterableClasspath extends CloseableFilterableJavaFileObjectIterable
 			try {
 				openArchive.close();
 			} catch (IOException ioe) {
-				logger.debug("Unexpected error closing archive {}",openArchive,ioe);
+//				logger.debug("Unexpected error closing archive {}",openArchive,ioe);
 			}
 		}
 		openArchives.clear();
@@ -130,7 +130,7 @@ public class IterableClasspath extends CloseableFilterableJavaFileObjectIterable
 										return;
 									} else if (nestedZip == null && entryName.startsWith("lib/") && entryName.endsWith(".jar")) {
 										// nested jar in uber jar
-										logger.debug("opening nested archive {}",entry.getName());
+//										logger.debug("opening nested archive {}",entry.getName());
 										ZipInputStream zis = new ZipInputStream(openArchive.getInputStream(entry));
 	//									nextEntry = new NestedZipEntryJavaFileObject(openArchive.firstElement(),openArchive.peek(),entry);
 										Enumeration<? extends ZipEntry> nestedZipEnumerator = new ZipEnumerator(zis);
@@ -159,7 +159,7 @@ public class IterableClasspath extends CloseableFilterableJavaFileObjectIterable
 						}
 					}
 				} catch (IOException ioe) {
-					logger.debug("Unexpected error whilst processing classpath entries",ioe);
+//					logger.debug("Unexpected error whilst processing classpath entries",ioe);
 				}
 			}
 		}

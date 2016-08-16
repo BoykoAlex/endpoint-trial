@@ -36,9 +36,6 @@ import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * A JavaFileObject that represents a source artifact created for compilation or an output
  * artifact producing during compilation (a .class file or some other thing if an annotation
@@ -49,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class InMemoryJavaFileObject implements JavaFileObject {
 
-	private final static Logger logger = LoggerFactory.getLogger(InMemoryJavaFileObject.class);
+//	private final static Logger logger = LoggerFactory.getLogger(InMemoryJavaFileObject.class);
 	
 	private Location location;
 	private String packageName;
@@ -134,13 +131,13 @@ public class InMemoryJavaFileObject implements JavaFileObject {
 		if (content == null) {
 			throw new FileNotFoundException();
 		}
-		logger.debug("opening input stream for {}",getName());
+//		logger.debug("opening input stream for {}",getName());
 		return new ByteArrayInputStream(content);
 	}
 
 	@Override
 	public OutputStream openOutputStream() throws IOException {
-		logger.debug("opening output stream for {}",getName());
+//		logger.debug("opening output stream for {}",getName());
 		return new ByteArrayOutputStream() {
 			@Override
 			public void close() throws IOException {
