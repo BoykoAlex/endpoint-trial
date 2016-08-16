@@ -25,6 +25,7 @@ public class SourceWatcher {
 
 	FileSystemWatcher watcher;
 	File root;
+	String classespath;
 
 	public SourceWatcher(String path) {
 		watcher = new FileSystemWatcher(true, 1000, 400);
@@ -142,7 +143,7 @@ public class SourceWatcher {
 		private List<String> discoverLocations(String classname) {
 			List<String> collector = new ArrayList<String>();
 			System.out.print("Scanning for '" + classname + "'.");
-			find(root, classname, collector);
+			find(classespath==null?root:new File(classespath), classname, collector);
 			System.out.println("found #" + collector.size() + " locations");
 			targetLocations.put(classname, collector);
 			return collector;
@@ -165,5 +166,9 @@ public class SourceWatcher {
 			}
 		}
 
+	}
+
+	public void setClassesPath(String classespath) {
+		this.classespath = classespath;
 	}
 }
