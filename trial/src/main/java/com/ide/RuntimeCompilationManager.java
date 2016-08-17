@@ -8,15 +8,14 @@ public class RuntimeCompilationManager {
 	SourceWatcher sourceWatcher;
 
 	public RuntimeCompilationManager() {
-		String path = System.getProperty("sourcepath");
-		if (path == null || path.length() == 0) {
-			path = ".";
+		String sourceroot = System.getProperty("sourceroot");
+		if (sourceroot == null || sourceroot.length() == 0) {
+			sourceroot = ".";
 		}
-		String classespath = System.getProperty("classespath");
-		System.out.println("Watch root: " + path);
-		sourceWatcher = new SourceWatcher(path);
-		if (classespath!=null && classespath.length()!=0) {
-			sourceWatcher.setClassesPath(classespath);
+		String targetroot = System.getProperty("targetroot");
+		sourceWatcher = new SourceWatcher(sourceroot);
+		if (targetroot!=null && targetroot.length()!=0) {
+			sourceWatcher.setTargetRoot(targetroot);
 		}
 		sourceWatcher.start();
 	}

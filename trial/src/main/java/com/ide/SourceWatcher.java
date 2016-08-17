@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,15 +24,39 @@ public class SourceWatcher {
 
 	FileSystemWatcher watcher;
 	File root;
-	String classespath;
+	String targetroot;
 
 	public SourceWatcher(String path) {
 		watcher = new FileSystemWatcher(true, 1000, 400);
 		watcher.addListener(new SourceChangeListener());
-		this.root = new File(path);
+		try {
+			String fullpath = new File(path).getCanonicalPath();
+			System.out.println("sourcesroot = "+fullpath);
+			this.root = new File(fullpath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		walk(watcher, this.root);
 	}
+	
+	private static Set<String> supported_suffixes;
+	
+	static {
+		supported_suffixes = new HashSet<String>();
+		supported_suffixes.add(".java");
+		supported_suffixes.add(".properties");
+		supported_suffixes.add(".yml");
+		supported_suffixes.add(".html");
+		supported_suffixes.add(".js");
+		supported_suffixes.add(".css");
+	}
 
+	private static String getSuffix(File file) {
+		String s = file.toString();
+		return s.substring(s.lastIndexOf("."));
+	}
+	
 	private static void walk(FileSystemWatcher watcher, File path) {
 		File[] files = path.listFiles();
 		boolean hasSources = false;
@@ -41,8 +64,10 @@ public class SourceWatcher {
 			for (File file : files) {
 				if (file.isDirectory()) {
 					walk(watcher, file);
-				} else if (file.getName().endsWith(".java")) {
-					hasSources = true;
+				} else {
+					if (supported_suffixes.contains(getSuffix(file))) {
+						hasSources = true;
+					}
 				}
 			}
 		}
@@ -65,19 +90,26 @@ public class SourceWatcher {
 		@Override
 		public void onChange(Set<ChangedFiles> changeSet) {
 			Set<File> toCompile = new HashSet<File>();
+			Set<File> toCopy = new HashSet<File>();
 			for (ChangedFiles changedFiles : changeSet) {
 				Set<ChangedFile> changedFilesInSet = changedFiles.getFiles();
 				for (ChangedFile changedFile : changedFilesInSet) {
-					// System.out.println("Change in "+changedFile.getFile());
-					// Watching a directory we may sometimes see .class files
-					// come in here...
-					if (changedFile.getFile().getName().endsWith(".java")) {
-						toCompile.add(changedFile.getFile());
+					// Watching dirs so may get some random stuff in here.
+					// Some files we just want to copy, some we want to compile
+					String suffix = getSuffix(changedFile.getFile());
+					if (supported_suffixes.contains(suffix)) {
+						if (changedFile.getFile().getName().endsWith(".java")) {
+							toCompile.add(changedFile.getFile());
+						} else {
+							toCopy.add(changedFile.getFile());
+						}
 					}
 				}
 			}
 			System.out.println("To compile: " + toCompile);
+			System.out.println("To copy: " + toCopy);
 			compile(toCompile);
+			copy(toCopy);
 		}
 
 		public String loadFile(File f) {
@@ -96,6 +128,7 @@ public class SourceWatcher {
 				throw new RuntimeException(e);
 			}
 		}
+		
 
 		private String toShortName(String name) {
 			return name.substring(0, name.lastIndexOf("."));
@@ -120,34 +153,61 @@ public class SourceWatcher {
 				}
 			}
 		}
+		
+		private void copy(Set<File> toCopy) {
+			String sourcesPath = root.getAbsolutePath().toString();
+			byte[] bs = new byte[5];
+			int read;
+			for (File f: toCopy) {
+//				String contents = loadFile(f);
+				String fromPath = f.getPath();
+				if (fromPath.startsWith(sourcesPath)) {
+					String toPath = targetroot+fromPath.substring(sourcesPath.length());
+					System.out.println("Copying from "+sourcesPath+" to "+toPath);
+					String dir = toPath.substring(0, toPath.lastIndexOf(File.separator));
+					new File(dir).mkdirs();
+					try {
+						FileInputStream fis = new FileInputStream(f);
+						FileOutputStream fos = new FileOutputStream(new File(toPath));
+						while ((read=fis.read(bs))!=-1) {
+							fos.write(bs, 0, read);
+						}
+						fis.close();
+						fos.close();
+					} catch (IOException e) {
+						throw new RuntimeException("Failed to copy to " + toPath, e);
+					}
+				} else {
+					System.out.println("Problem? "+fromPath+" not on sourcespath "+sourcesPath);
+				}
+				
+			}
+		}
 
 		private void writeClass(String className, byte[] bytes) {
-			List<String> dumpLocations = targetLocations.get(className);
-			if (dumpLocations == null) {
-				dumpLocations = discoverLocations(className);
-			}
-			for (String location : dumpLocations) {
-				FileOutputStream fos;
-				try {
-					System.out.println("Writing class '" + className + "' out to: " + location);
-					fos = new FileOutputStream(new File(location));
-					fos.write(bytes, 0, bytes.length);
-					fos.close();
-				} catch (IOException e) {
-					throw new RuntimeException("Failed to write out to " + location, e);
-				}
-
+			String toPath = targetroot==null?root.getAbsolutePath():targetroot+File.separator+className.replaceAll("\\.", File.separator)+".class";
+			System.out.println("Writing class "+className+" to "+toPath);
+			// Ensure directories exist - might be a new file
+			String dir = toPath.substring(0, toPath.lastIndexOf(File.separator));
+			new File(dir).mkdirs();
+			FileOutputStream fos;
+			try {
+				fos = new FileOutputStream(new File(toPath));
+				fos.write(bytes, 0, bytes.length);
+				fos.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to write out to " + toPath, e);
 			}
 		}
 
-		private List<String> discoverLocations(String classname) {
-			List<String> collector = new ArrayList<String>();
-			System.out.print("Scanning for '" + classname + "'.");
-			find(classespath==null?root:new File(classespath), classname, collector);
-			System.out.println("found #" + collector.size() + " locations");
-			targetLocations.put(classname, collector);
-			return collector;
-		}
+//		private List<String> discoverLocations(String classname) {
+//			List<String> collector = new ArrayList<String>();
+//			System.out.print("Scanning for '" + classname + "'.");
+//			find(classespath==null?root:new File(classespath), classname, collector);
+//			System.out.println("found #" + collector.size() + " locations");
+//			targetLocations.put(classname, collector);
+//			return collector;
+//		}
 
 		private void find(File path, String classname, List<String> collector) {
 			System.out.print(".");
@@ -168,7 +228,13 @@ public class SourceWatcher {
 
 	}
 
-	public void setClassesPath(String classespath) {
-		this.classespath = classespath;
+	public void setTargetRoot(String targetroot) {
+		try {
+			String fullpath = new File(targetroot).getCanonicalPath();
+			this.targetroot = fullpath;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Targetroot = "+this.targetroot);
 	}
 }
