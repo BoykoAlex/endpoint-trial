@@ -2,4 +2,4 @@ zuul:
   routes:
     ide:
       path: /ide/**
-      url: http://localhost:9000
+      url: http://localhost:9000/ide/
