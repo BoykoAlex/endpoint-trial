@@ -15,6 +15,7 @@
  */
 package org.springframework.compiler.runner.javac;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -76,6 +77,22 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 			toClose.add(resultIterable);
 		} else if (location == StandardLocation.CLASS_PATH && (kinds==null || kinds.contains(Kind.CLASS))) {
 			String javaClassPath = System.getProperty("java.class.path");
+			// Is this a special? On CF, the classpath is:
+			// java.class.path=/home/vcap/app/classpath
+			if (javaClassPath.equals("/home/vcap/app/classpath")) {
+				System.out.println("Special classpath handling running");
+				StringBuilder sb = new StringBuilder();
+				// sun.boot.class.path=/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/resources.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/rt.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/sunrsasign.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/jsse.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/jce.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/charsets.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/jfr.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/classes
+				// Need to look in /home/vcap/app/classpath/BOOT-INF/lib
+				File f = new File("/home/vcap/app/classpath/BOOT-INF/lib");///home/vcap/app/classpath/BOOT-INF/lib");
+				if (f.exists()) {
+					String[] jars = f.list();
+					for (String jar: jars) {
+						sb.append("/home/vcap/app/classpath/BOOT-INF/lib/").append(jar).append(File.pathSeparator);
+					}
+				}
+				javaClassPath = sb.toString();
+			}
 			System.out.println("java.class.path="+javaClassPath);
 			//logger.debug("Creating iterable for class path: {}",javaClassPath);
 			resultIterable = new IterableClasspath(javaClassPath, packageName, recurse);
