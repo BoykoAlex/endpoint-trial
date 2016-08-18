@@ -46,12 +46,12 @@ public class RuntimeJavaCompiler {
 	 * @return a CompilationResult that encapsulates what happened during compilation (classes/messages produced)
 	 */
 	public CompilationResult compile(String className, String classSourceCode) {
-		Properties p = System.getProperties();
-		Enumeration<Object> keys = p.keys();
-		while (keys.hasMoreElements()) {
-			Object k = keys.nextElement();
-			System.out.println("SYSPROP "+k+"="+p.getProperty((String)k));
-		}
+//		Properties p = System.getProperties();
+//		Enumeration<Object> keys = p.keys();
+//		while (keys.hasMoreElements()) {
+//			Object k = keys.nextElement();
+//			System.out.println("SYSPROP "+k+"="+p.getProperty((String)k));
+//		}
 		System.out.println("Compiling source for class "+className+" using compiler "+compiler.getClass().getName());
 		
 		DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();

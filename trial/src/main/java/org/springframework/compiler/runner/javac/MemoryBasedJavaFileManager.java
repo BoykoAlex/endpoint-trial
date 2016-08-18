@@ -82,7 +82,6 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 			// Is this a special? On CF, the classpath is:
 			// java.class.path=/home/vcap/app/classpath
 			if (javaClassPath.equals("/home/vcap/app/classpath")) {
-				System.out.println("Special classpath handling running");
 				StringBuilder sb = new StringBuilder();
 				// sun.boot.class.path=/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/resources.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/rt.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/sunrsasign.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/jsse.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/jce.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/charsets.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/lib/jfr.jar:/home/vcap/app/jdk/jdk1.8.0_101/jre/classes
 				// Need to look in /home/vcap/app/classpath/BOOT-INF/lib
