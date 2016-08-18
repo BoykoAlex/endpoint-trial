@@ -53,8 +53,12 @@ public class SourceWatcher {
 	}
 
 	private static String getSuffix(File file) {
-		String s = file.toString();
-		return s.substring(s.lastIndexOf("."));
+		try {
+			String s = file.toString();
+			return s.substring(s.lastIndexOf("."));
+		} catch (StringIndexOutOfBoundsException sioobe) {
+			return "";
+		}
 	}
 	
 	private static void walk(FileSystemWatcher watcher, File path) {
