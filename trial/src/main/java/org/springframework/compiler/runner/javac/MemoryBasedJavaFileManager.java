@@ -70,11 +70,13 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 		CloseableFilterableJavaFileObjectIterable resultIterable = null;
 		if (location == StandardLocation.PLATFORM_CLASS_PATH && (kinds==null || kinds.contains(Kind.CLASS))) {
 			String sunBootClassPath = System.getProperty("sun.boot.class.path");
+			System.out.println("sun.boot.class.path="+sunBootClassPath);
 			//logger.debug("Creating iterable for boot class path: {}",sunBootClassPath);
 			resultIterable = new IterableClasspath(sunBootClassPath, packageName, recurse);
 			toClose.add(resultIterable);
 		} else if (location == StandardLocation.CLASS_PATH && (kinds==null || kinds.contains(Kind.CLASS))) {
 			String javaClassPath = System.getProperty("java.class.path");
+			System.out.println("java.class.path="+javaClassPath);
 			//logger.debug("Creating iterable for class path: {}",javaClassPath);
 			resultIterable = new IterableClasspath(javaClassPath, packageName, recurse);
 			toClose.add(resultIterable);
