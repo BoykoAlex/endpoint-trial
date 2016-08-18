@@ -54,7 +54,8 @@ public class SourceWatcher {
 
 	private static String getSuffix(File file) {
 		String s = file.toString();
-		return s.substring(s.lastIndexOf("."));
+		int idx = s.lastIndexOf(".");
+		return idx == -1 ? null : s.substring(idx);
 	}
 	
 	private static void walk(FileSystemWatcher watcher, File path) {
