@@ -42,6 +42,8 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 
 //	private static Logger logger = LoggerFactory.getLogger(MemoryBasedJavaFileManager.class);
 	
+	private static boolean printedClasspath= false;
+	
 	private CompilationOutputCollector outputCollector;
 
 	private List<CloseableFilterableJavaFileObjectIterable> toClose = new ArrayList<>();
@@ -71,7 +73,7 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 		CloseableFilterableJavaFileObjectIterable resultIterable = null;
 		if (location == StandardLocation.PLATFORM_CLASS_PATH && (kinds==null || kinds.contains(Kind.CLASS))) {
 			String sunBootClassPath = System.getProperty("sun.boot.class.path");
-			System.out.println("sun.boot.class.path="+sunBootClassPath);
+//			System.out.println("sun.boot.class.path="+sunBootClassPath);
 			//logger.debug("Creating iterable for boot class path: {}",sunBootClassPath);
 			resultIterable = new IterableClasspath(sunBootClassPath, packageName, recurse);
 			toClose.add(resultIterable);
@@ -93,7 +95,10 @@ public class MemoryBasedJavaFileManager implements JavaFileManager {
 				}
 				javaClassPath = sb.toString();
 			}
-			System.out.println("java.class.path="+javaClassPath);
+			if (!printedClasspath) {
+				System.out.println("java.class.path="+javaClassPath);
+				printedClasspath=true;
+			}
 			//logger.debug("Creating iterable for class path: {}",javaClassPath);
 			resultIterable = new IterableClasspath(javaClassPath, packageName, recurse);
 			toClose.add(resultIterable);
